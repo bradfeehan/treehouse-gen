@@ -35,3 +35,6 @@ treehouse_gen-*.tar
 npm-debug.log
 /assets/node_modules/
 
+
+# Secret build artifacts from setup-mix cache
+/.__secret_app_build_folder/

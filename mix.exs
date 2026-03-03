@@ -74,7 +74,7 @@ defmodule TreehouseGen.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "assets.setup", "assets.build"],
+      setup: ["hooks.install", "deps.get", "assets.setup", "assets.build"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["compile", "tailwind treehouse_gen", "esbuild treehouse_gen"],
       "assets.deploy": [
@@ -82,7 +82,8 @@ defmodule TreehouseGen.MixProject do
         "esbuild treehouse_gen --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
+      "hooks.install": ["cmd git config core.hooksPath .githooks"],
+      precommit: ["format --check-formatted", "compile --warnings-as-errors", "test"]
     ]
   end
 end
