@@ -1,0 +1,14 @@
+name: Copilot setup steps
+
+on:
+  workflow_dispatch:
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: erlef/setup-beam@v1
+      - uses: ex-actions/setup-mix@main
