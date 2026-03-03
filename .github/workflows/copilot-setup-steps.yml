@@ -11,4 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.x"
       - uses: ex-actions/setup-mix@main
