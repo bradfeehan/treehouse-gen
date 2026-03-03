@@ -12,15 +12,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Set up Elixir and Erlang
-        if: ${{ hashFiles('mix.exs') != '' }}
-        uses: erlef/setup-beam@v1
+      - name: Set up Mix
+        if: ${{ hashFiles('mix.exs') != '' && hashFiles('.tool-versions') != '' }}
+        uses: ex-actions/setup-mix@v1
         with:
-          elixir-version: '1.17'
-          otp-version: '27'
+          version-file: .tool-versions
 
       - name: Install Elixir dependencies
-        if: ${{ hashFiles('mix.exs') != '' }}
+        if: ${{ hashFiles('mix.exs') != '' && hashFiles('.tool-versions') != '' }}
         run: |
           mix local.hex --force
           mix local.rebar --force
