@@ -38,3 +38,4 @@ npm-debug.log
 
 # Secret build artifacts from setup-mix cache
 /.__secret_app_build_folder/
+/.__secret_deps_build_folder/
