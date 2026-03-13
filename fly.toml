@@ -1,0 +1,20 @@
+app = "treehouse-gen"
+primary_region = "iad"
+
+[env]
+  PHX_HOST = "treehouse-gen.fly.dev"
+  PHX_SERVER = "true"
+  PORT = "4000"
+
+[http_service]
+  internal_port = 4000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
