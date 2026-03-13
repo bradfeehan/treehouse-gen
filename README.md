@@ -10,11 +10,12 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 ## Deploying to Fly.io
 
 - Pushes to `main` trigger `.github/workflows/fly-deploy.yml`, which deploys the app to Fly.io using the `production` GitHub Actions environment.
+- Fly CLI handles the build and release flow during `flyctl deploy`, so no committed Dockerfile or generated Phoenix release files are required.
 - `fly.toml` is configured for a single shared CPU VM with 256 MB RAM and `min_machines_running = 0` to keep costs down.
 - Before the first deploy, set the required Fly secret:
 
   ```sh
-  flyctl secrets set SECRET_KEY_BASE="$(mix phx.gen.secret)" --app treehouse-gen
+  flyctl secrets set SECRET_KEY_BASE="$(openssl rand -base64 48)" --app treehouse-gen
   ```
 
 Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
