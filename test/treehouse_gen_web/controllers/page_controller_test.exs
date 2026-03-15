@@ -3,6 +3,6 @@ defmodule TreehouseGenWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Hello, world!"
+    assert html_response(conn, 200) =~ "Hello, World!"
   end
 end
