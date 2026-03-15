@@ -5,6 +5,6 @@ defmodule TreehouseGenWeb.HelloLiveTest do
 
   test "renders hello world", %{conn: conn} do
     {:ok, _view, html} = live(conn, ~p"/")
-    assert html =~ "Hello, world!"
+    assert html =~ "Hello, World!"
   end
 end
