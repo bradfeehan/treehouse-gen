@@ -40,10 +40,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: erlef/setup-beam@v1
+        if: github.event.action != 'closed'
         with:
           version-file: .tool-versions
           version-type: strict
       - uses: ex-actions/setup-mix@241f8779b2000ce1880ebdd4ad09bdc291d8470c
+        if: github.event.action != 'closed'
+
       - uses: superfly/flyctl-actions/setup-flyctl@63da3ecc5e2793b98a3f2519b3d75d4f4c11cec2
 
       - name: Deploy
