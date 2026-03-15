@@ -5,13 +5,18 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
 
 jobs:
   deploy:
-    name: Deploy app
+    name: "Deploy: Production"
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     concurrency: deploy-group
-    environment: production
+    environment:
+      name: production
+      url: https://treehouse-gen.fly.dev
     permissions:
       contents: read
     steps:
@@ -20,3 +25,32 @@ jobs:
       - run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  deploy-preview:
+    name: "Deploy: Preview"
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pr-${{ github.event.number }}
+    environment:
+      name: pr-${{ github.event.number }}
+      url: ${{ steps.deploy.outputs.url }}
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: superfly/flyctl-actions/setup-flyctl@63da3ecc5e2793b98a3f2519b3d75d4f4c11cec2
+      - id: deploy
+        uses: superfly/fly-pr-review-apps@1.5.0
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_ORG_API_TOKEN }}
+          FLY_REGION: syd
+          FLY_ORG: bradfeehan
+
+      - name: Clean up GitHub environment
+        uses: strumwolf/delete-deployment-environment@v2
+        if: github.event.action == 'closed'
+        with:
+          # ⚠️ The provided token needs permission for admin write:org
+          token: ${{ secrets.GITHUB_TOKEN_ORG_WRITE }}
+          environment: pr-${{ github.event.number }}
