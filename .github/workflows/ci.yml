@@ -17,7 +17,7 @@ jobs:
           version-file: .tool-versions
           version-type: strict
 
-      - uses: ex-actions/setup-mix@main
+      - uses: ex-actions/setup-mix@241f8779b2000ce1880ebdd4ad09bdc291d8470c
 
       - name: Check formatting
         run: mix format --check-formatted
