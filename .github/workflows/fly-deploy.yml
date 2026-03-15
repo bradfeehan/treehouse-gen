@@ -107,5 +107,5 @@ jobs:
         if: github.event.action == 'closed'
         with:
           # ⚠️ The provided token needs permission for admin write:org
-          token: ${{ secrets.GITHUB_TOKEN_ORG_WRITE }}
+          token: ${{ secrets.TREEHOUSE_GITHUB_TOKEN_ORG_WRITE }}
           environment: pr-${{ github.event.number }}
