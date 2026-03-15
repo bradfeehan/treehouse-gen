@@ -45,12 +45,59 @@ jobs:
           version-type: strict
       - uses: ex-actions/setup-mix@241f8779b2000ce1880ebdd4ad09bdc291d8470c
       - uses: superfly/flyctl-actions/setup-flyctl@63da3ecc5e2793b98a3f2519b3d75d4f4c11cec2
-      - id: deploy
-        uses: superfly/fly-pr-review-apps@1.5.0
+
+      - name: Deploy
+        id: deploy
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_ORG_API_TOKEN }}
           FLY_REGION: syd
           FLY_ORG: personal
+          APP_NAME: treehouse-gen-pr-${{ github.event.number }}
+          CONFIG: fly.toml
+        run: |
+          echo "App name: '$APP_NAME'"
+          if [ "${{ github.event.action }}" = "closed" ]; then
+            flyctl apps destroy "$APP_NAME" -y || true
+            exit 0
+          fi
+
+          # Deploy the Fly app, creating it first if needed.
+          if ! flyctl status --app "$APP_NAME"; then
+            # Backup the original config file since 'flyctl launch' messes up the [build.args] section
+            cp "$CONFIG" "$CONFIG.bak"
+            flyctl launch \
+              --no-deploy \
+              --copy-config \
+              --name "$APP_NAME" \
+              --region "$FLY_REGION" \
+              --org "$FLY_ORG"
+            # Restore the original config file
+            cp "$CONFIG.bak" "$CONFIG"
+          fi
+
+          # Import secrets
+          flyctl secrets set SECRET_KEY_BASE='${{ secrets.SECRET_KEY_BASE_PREVIEW_APP }}' --app "$APP_NAME"
+
+          # Deploy
+          flyctl deploy \
+            --config "$CONFIG" \
+            --app "$APP_NAME" \
+            --regions "$FLY_REGION" \
+            --strategy immediate \
+            --vm-cpu-kind shared \
+            --vm-cpus 1 \
+            --vm-memory 1024
+
+          # Scale to 1 instance
+          flyctl scale count 1 --app "$APP_NAME" --yes
+
+          flyctl status --app "$APP_NAME" --json >status.json
+          hostname="$(jq -r .Hostname status.json)"
+          appid="$(jq -r .ID status.json)"
+          echo "hostname=$hostname" >> $GITHUB_OUTPUT
+          echo "url=https://$hostname" >> $GITHUB_OUTPUT
+          echo "id=$appid" >> $GITHUB_OUTPUT
+          echo "name=$APP_NAME" >> $GITHUB_OUTPUT
 
       - name: Clean up GitHub environment
         uses: strumwolf/delete-deployment-environment@v2
